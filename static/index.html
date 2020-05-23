@@ -6,13 +6,25 @@
 </head>
 <body>
 <div>
-    <svg id="svgout" width="1600" height="900">
+    <svg id="raft" width="1600" height="900">
+        <defs>
+
+        </defs>
         <g transform="translate(300 100)">
+
             <!--            <circle cx='200' cy='200' r='200' fill='gray' stroke='blue' style="opacity: 0.2"/>-->
-            <g transform="translate(200 0)">
+            <g id="s0" transform="translate(200 0)">
                 <text dx='30' dy="0" font-size="30">S0</text>
-                <circle cx='50' cy='80' r='50' fill='#87c790' stroke='#b5580d' stroke-width="8" style="opacity: 0.8"/>
+                <circle cx='50' cy='80' r='50' fill='#87c790' stroke='#b5580d' stroke-width="8"
+                        style="opacity: 0.8"/>
                 <text dx='35' dy="85" font-size="30">10</text>
+                <path id="s0-timer" class="timer" d=" M 50, 30 a 50,50 0 1,1 0,100 a 50,50 0 1,1 0,-100 "
+                  stroke-width="8"
+                  stroke="blue"
+                  stroke-dasharray="315 315"
+                  stroke-dashoffset="315"
+                  opacity="0.5"
+                  fill="none"/>
             </g>
             <g transform="translate(0 180)">
                 <text dx='30' dy="0" font-size="30">S4</text>
@@ -35,14 +47,13 @@
                 <text dx='35' dy="85" font-size="30">10</text>
             </g>
         </g>
-
     </svg>
-    <ul id="messages">
 
-    </ul>
 </div>
 <script src="scripts/jquery.js"></script>
 <script src="scripts/socket.io.js"></script>
+<script src="scripts/snap.svg.js"></script>
+<script src="scripts/snap.plugin.js"></script>
 <script type="text/javascript" charset="utf-8">
     let socket = io('/raft-monitor');
     socket.on('connect', function () {
@@ -50,8 +61,10 @@
     });
     socket.on('update monitor', function (msg) {
         console.log('got ' + msg);
-        $("#messages").append('li').html(msg);
     });
+    snap = Snap('#raft');
+    snap.select('#s0-timer').animate({"stroke-dashoffset": 0}, 10000, mina.easeinout);
+
 </script>
 </body>
 </html>
