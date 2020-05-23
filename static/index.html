@@ -89,30 +89,35 @@
         console.log('got ' + msg);
     });
     snap = Snap('#raft');
-    snap.select('#s0-timer').animate({"stroke-dashoffset": 0}, 10000, mina.easeinout);
-    snap.select('#s1-timer').animate({"stroke-dashoffset": 0}, 10000, mina.easeinout);
-    snap.select('#s2-timer').animate({"stroke-dashoffset": 0}, 10000, mina.easeinout);
-    snap.select('#s3-timer').animate({"stroke-dashoffset": 0}, 10000, mina.easeinout);
-    snap.select('#s4-timer').animate({"stroke-dashoffset": 0}, 10000, mina.easeinout);
 
-    points = [
-        [250, 150], [120, 260], [380, 260], [150, 410], [350, 410]
-    ]
-    let g = snap.select('#cluster').g();
     for (let i = 0; i < 5; i++) {
-        let dot = snap.circle(points[i][0], points[i][1], 10);
-        g.add(dot);
+        snap.select('#s' + i + '-timer').animate({"stroke-dashoffset": 0}, 6000, mina.easeinout);
     }
 
-    for (let i = 0; i < 5; i++) {
-        for (let j = 0; j < 5; j++) {
-            if (i == j) continue;
-            let path = snap.path("M " + points[i][0] + "," + points[i][1]
-                + " L " + points[j][0] + "," + points[j][1])
-                .attr({"stroke": "blue", "stroke-dasharray": "5 10"});
-            g.add(path);
+    function heartbeat() {
+        let points = [
+            [250, 150], [120, 260], [380, 260], [150, 410], [350, 410]
+        ]
+        let g = snap.select('#cluster').g();
+        for (let i = 0; i < 5; i++) {
+            for (let j = 0; j < 5; j++) {
+                if (i == j) continue;
+                let path = snap.path("M " + points[i][0] + "," + points[i][1]
+                    + " L " + points[j][0] + "," + points[j][1])
+                    .attr({"stroke": "blue", "stroke-dasharray": "5 10"});
+                g.add(path);
+                g.circle(points[i][0], points[i][1], 10)
+                    .animate(
+                        {cx: points[j][0], cy: points[j][1]},
+                        6000,
+                        mina.linear
+                    );
+            }
         }
     }
+
+    heartbeat();
+
 
 </script>
 </body>
