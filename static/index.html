@@ -2,11 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>可视化系统 - Visualize Systems</title>
+    <title>Raft 监控 - Monitor </title>
 </head>
 <body>
-<div id="messages">
+<div>
+    <svg id="svgout" width="1600" height="900">
+        <g transform="translate(300 200)">
+            <circle cx='200' cy='200' r='200' fill='gray' stroke='blue' style="opacity: 0.2"/>
+            <circle cx='200' cy='0' r='50' fill='#87c790' stroke='#b5580d' stroke-width="8" style="opacity: 0.8"/>
+            <circle cx='0' cy='150' r='50' fill='#87c790' stroke='#b5580d' stroke-width="8" style="opacity: 0.8"/>
+            <circle cx='400' cy='150' r='50' fill='#87c790' stroke='#b5580d' stroke-width="8" style="opacity: 0.8"/>
+            <circle cx='100' cy='380' r='50' fill='#87c790' stroke='#b5580d' stroke-width="8" style="opacity: 0.8"/>
+            <circle cx='300' cy='380' r='50' fill='#87c790' stroke='#b5580d' stroke-width="8" style="opacity: 0.8"/>
+        </g>
 
+    </svg>
+    <ul id="messages">
+
+    </ul>
 </div>
 <script src="scripts/jquery.js"></script>
 <script src="scripts/socket.io.js"></script>
@@ -17,6 +30,7 @@
     });
     socket.on('update monitor', function (msg) {
         console.log('got ' + msg);
+        $("#messages").append('li').html(msg);
     });
 </script>
 </body>
