@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>可视化系统 - Visualize Systems</title>
+</head>
+<body>
+<div id="messages">
+
+</div>
+<script src="scripts/jquery.js"></script>
+<script src="scripts/socket.io.js"></script>
+<script type="text/javascript" charset="utf-8">
+    let socket = io('/raft-monitor');
+    socket.on('connect', function () {
+        socket.emit('client action', {data: 'raft monitor is connected!'});
+    });
+    socket.on('update monitor', function (msg) {
+        console.log('got ' + msg);
+    });
+</script>
+</body>
+</html>
