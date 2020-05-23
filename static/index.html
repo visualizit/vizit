@@ -10,41 +10,67 @@
         <defs>
 
         </defs>
-        <g transform="translate(300 100)">
-
-            <!--            <circle cx='200' cy='200' r='200' fill='gray' stroke='blue' style="opacity: 0.2"/>-->
+        <g id="cluster" transform="translate(300 100)">
             <g id="s0" transform="translate(200 0)">
                 <text dx='30' dy="0" font-size="30">S0</text>
                 <circle cx='50' cy='80' r='50' fill='#87c790' stroke='#b5580d' stroke-width="8"
                         style="opacity: 0.8"/>
                 <text dx='35' dy="85" font-size="30">10</text>
                 <path id="s0-timer" class="timer" d=" M 50, 30 a 50,50 0 1,1 0,100 a 50,50 0 1,1 0,-100 "
-                  stroke-width="8"
-                  stroke="blue"
-                  stroke-dasharray="315 315"
-                  stroke-dashoffset="315"
-                  opacity="0.5"
-                  fill="none"/>
+                      stroke-width="8"
+                      stroke="blue"
+                      stroke-dasharray="315 315"
+                      stroke-dashoffset="315"
+                      opacity="0.5"
+                      fill="none"/>
             </g>
             <g transform="translate(0 180)">
-                <text dx='30' dy="0" font-size="30">S4</text>
+                <text dx='-50' dy="90" font-size="30">S4</text>
                 <circle cx='50' cy='80' r='50' fill='#87c790' stroke='#b5580d' stroke-width="8" style="opacity: 0.8"/>
                 <text dx='35' dy="85" font-size="30">10</text>
+                <path id="s4-timer" class="timer" d=" M 50, 30 a 50,50 0 1,1 0,100 a 50,50 0 1,1 0,-100 "
+                      stroke-width="8"
+                      stroke="blue"
+                      stroke-dasharray="315 315"
+                      stroke-dashoffset="315"
+                      opacity="0.5"
+                      fill="none"/>
             </g>
             <g transform="translate(400 180)">
-                <text dx='30' dy="0" font-size="30">S1</text>
+                <text dx='120' dy="90" font-size="30">S1</text>
                 <circle cx='50' cy='80' r='50' fill='#87c790' stroke='#b5580d' stroke-width="8" style="opacity: 0.8"/>
                 <text dx='35' dy="85" font-size="30">10</text>
+                <path id="s1-timer" class="timer" d=" M 50, 30 a 50,50 0 1,1 0,100 a 50,50 0 1,1 0,-100 "
+                      stroke-width="8"
+                      stroke="blue"
+                      stroke-dasharray="315 315"
+                      stroke-dashoffset="315"
+                      opacity="0.5"
+                      fill="none"/>
             </g>
             <g transform="translate(80 400)">
-                <text dx='30' dy="0" font-size="30">S3</text>
+                <text dx='30' dy="180" font-size="30">S3</text>
                 <circle cx='50' cy='80' r='50' fill='#87c790' stroke='#b5580d' stroke-width="8" style="opacity: 0.8"/>
                 <text dx='35' dy="85" font-size="30">10</text>
+                <path id="s3-timer" class="timer" d=" M 50, 30 a 50,50 0 1,1 0,100 a 50,50 0 1,1 0,-100 "
+                      stroke-width="8"
+                      stroke="blue"
+                      stroke-dasharray="315 315"
+                      stroke-dashoffset="315"
+                      opacity="0.5"
+                      fill="none"/>
             </g>
             <g transform="translate(320 400)">
-                <text dx='30' dy="0" font-size="30">S2</text>
+                <text dx='30' dy="180" font-size="30">S2</text>
                 <circle cx='50' cy='80' r='50' fill='#87c790' stroke='#b5580d' stroke-width="8" style="opacity: 0.8"/>
                 <text dx='35' dy="85" font-size="30">10</text>
+                <path id="s2-timer" class="timer" d=" M 50, 30 a 50,50 0 1,1 0,100 a 50,50 0 1,1 0,-100 "
+                      stroke-width="8"
+                      stroke="blue"
+                      stroke-dasharray="315 315"
+                      stroke-dashoffset="315"
+                      opacity="0.5"
+                      fill="none"/>
             </g>
         </g>
     </svg>
@@ -64,6 +90,29 @@
     });
     snap = Snap('#raft');
     snap.select('#s0-timer').animate({"stroke-dashoffset": 0}, 10000, mina.easeinout);
+    snap.select('#s1-timer').animate({"stroke-dashoffset": 0}, 10000, mina.easeinout);
+    snap.select('#s2-timer').animate({"stroke-dashoffset": 0}, 10000, mina.easeinout);
+    snap.select('#s3-timer').animate({"stroke-dashoffset": 0}, 10000, mina.easeinout);
+    snap.select('#s4-timer').animate({"stroke-dashoffset": 0}, 10000, mina.easeinout);
+
+    points = [
+        [250, 150], [120, 260], [380, 260], [150, 410], [350, 410]
+    ]
+    let g = snap.select('#cluster').g();
+    for (let i = 0; i < 5; i++) {
+        let dot = snap.circle(points[i][0], points[i][1], 10);
+        g.add(dot);
+    }
+
+    for (let i = 0; i < 5; i++) {
+        for (let j = 0; j < 5; j++) {
+            if (i == j) continue;
+            let path = snap.path("M " + points[i][0] + "," + points[i][1]
+                + " L " + points[j][0] + "," + points[j][1])
+                .attr({"stroke": "blue", "stroke-dasharray": "5 10"});
+            g.add(path);
+        }
+    }
 
 </script>
 </body>
