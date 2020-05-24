@@ -1,3 +1,4 @@
+import json
 import logging
 from datetime import datetime
 from flask import Flask, request, jsonify
@@ -18,6 +19,14 @@ def monitor_action():
     return jsonify(action)
 
 
+@app.route('/monitor/state', methods=['POST'])
+def monitor_state():
+    payload = request.get_json()
+    logging.info(f'update state {payload}')
+    socket_io.emit('update state', json.dumps(payload), namespace=NAMESPACE)
+    return payload
+
+
 @app.route('/', methods=['GET'])
 def index():
     socket_io.emit('update monitor', f'now: {datetime.now()}', namespace=NAMESPACE)
@@ -26,7 +35,7 @@ def index():
 
 @socket_io.on('client action', namespace=NAMESPACE)
 def handle_client_action(json):
-    print(f'client action: {str(json)}')
+    logging.info(f'client action: {str(json)}')
 
 
 if __name__ == '__main__':

@@ -2,96 +2,38 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Raft 监控 - Monitor </title>
+    <title>Raft集群 监控动画 - Raft Cluster Monitor </title>
+    <link rel="stylesheet" type="text/css" href="style/raft.css?1">
 </head>
 <body>
-<div>
-    <svg id="raft" width="1600" height="900">
-        <defs>
-
-        </defs>
-        <g id="cluster" transform="translate(300 100)">
-            <g id="s0" transform="translate(200 0)">
-                <text dx='30' dy="0" font-size="30">S0</text>
-                <circle cx='50' cy='80' r='50' fill='#87c790' stroke='#b5580d' stroke-width="8"
-                        style="opacity: 0.8"/>
-                <text dx='35' dy="85" font-size="30">10</text>
-                <path id="s0-timer" class="timer" d=" M 50, 30 a 50,50 0 1,1 0,100 a 50,50 0 1,1 0,-100 "
-                      stroke-width="8"
-                      stroke="blue"
-                      stroke-dasharray="315 315"
-                      stroke-dashoffset="315"
-                      opacity="0.5"
-                      fill="none"/>
-            </g>
-            <g transform="translate(0 180)">
-                <text dx='-50' dy="90" font-size="30">S4</text>
-                <circle cx='50' cy='80' r='50' fill='#87c790' stroke='#b5580d' stroke-width="8" style="opacity: 0.8"/>
-                <text dx='35' dy="85" font-size="30">10</text>
-                <path id="s4-timer" class="timer" d=" M 50, 30 a 50,50 0 1,1 0,100 a 50,50 0 1,1 0,-100 "
-                      stroke-width="8"
-                      stroke="blue"
-                      stroke-dasharray="315 315"
-                      stroke-dashoffset="315"
-                      opacity="0.5"
-                      fill="none"/>
-            </g>
-            <g transform="translate(400 180)">
-                <text dx='120' dy="90" font-size="30">S1</text>
-                <circle cx='50' cy='80' r='50' fill='#87c790' stroke='#b5580d' stroke-width="8" style="opacity: 0.8"/>
-                <text dx='35' dy="85" font-size="30">10</text>
-                <path id="s1-timer" class="timer" d=" M 50, 30 a 50,50 0 1,1 0,100 a 50,50 0 1,1 0,-100 "
-                      stroke-width="8"
-                      stroke="blue"
-                      stroke-dasharray="315 315"
-                      stroke-dashoffset="315"
-                      opacity="0.5"
-                      fill="none"/>
-            </g>
-            <g transform="translate(80 400)">
-                <text dx='30' dy="180" font-size="30">S3</text>
-                <circle cx='50' cy='80' r='50' fill='#87c790' stroke='#b5580d' stroke-width="8" style="opacity: 0.8"/>
-                <text dx='35' dy="85" font-size="30">10</text>
-                <path id="s3-timer" class="timer" d=" M 50, 30 a 50,50 0 1,1 0,100 a 50,50 0 1,1 0,-100 "
-                      stroke-width="8"
-                      stroke="blue"
-                      stroke-dasharray="315 315"
-                      stroke-dashoffset="315"
-                      opacity="0.5"
-                      fill="none"/>
-            </g>
-            <g transform="translate(320 400)">
-                <text dx='30' dy="180" font-size="30">S2</text>
-                <circle cx='50' cy='80' r='50' fill='#87c790' stroke='#b5580d' stroke-width="8" style="opacity: 0.8"/>
-                <text dx='35' dy="85" font-size="30">10</text>
-                <path id="s2-timer" class="timer" d=" M 50, 30 a 50,50 0 1,1 0,100 a 50,50 0 1,1 0,-100 "
-                      stroke-width="8"
-                      stroke="blue"
-                      stroke-dasharray="315 315"
-                      stroke-dashoffset="315"
-                      opacity="0.5"
-                      fill="none"/>
-            </g>
-        </g>
-    </svg>
-
-</div>
+<svg id="raft" width="1600" height="900">
+    <g id="cluster" transform="translate(300 100)"/>
+</svg>
 <script src="scripts/jquery.js"></script>
 <script src="scripts/socket.io.js"></script>
 <script src="scripts/snap.svg.js"></script>
 <script src="scripts/snap.plugin.js"></script>
 <script type="text/javascript" charset="utf-8">
-    let socket = io('/raft-monitor');
-    socket.on('connect', function () {
-        socket.emit('client action', {data: 'raft monitor is connected!'});
-    });
-    socket.on('update monitor', function (msg) {
-        console.log('got ' + msg);
-    });
     snap = Snap('#raft');
+    translates = [
+        [200, 0], [0, 180], [400, 180], [80, 400], [320, 400]
+    ]
+    for (let i = 0; i < 5; i++) {
+        let cluster_g = snap.select('#cluster');
+        let node = `S${i}`;
+        let node_g = cluster_g.g().attr({
+            id: node,
+            transform: `translate(${translates[i][0]} ${translates[i][1]})`
+        });
+        node_g.text(30, 180, node).addClass("node_name");
+        node_g.circle(50, 80, 50).addClass("follower");
+        node_g.text(35, 85, node).addClass("node_term");
+        node_g.path("M 50, 30 a 50,50 0 1,1 0,100 a 50,50 0 1,1 0,-100").addClass("node_timer");
+    }
 
     for (let i = 0; i < 5; i++) {
-        snap.select('#s' + i + '-timer').animate({"stroke-dashoffset": 0}, 6000, mina.easeinout);
+        snap.select(`#S${i} .node_timer`)
+            .animate({"stroke-dashoffset": 0}, 6000, mina.easeinout);
     }
 
     function heartbeat() {
@@ -118,7 +60,13 @@
 
     heartbeat();
 
-
+    let socket = io('/raft-monitor');
+    socket.on('connect', function () {
+        socket.emit('client action', {data: 'raft monitor is connected!'});
+    });
+    socket.on('update state', function (msg) {
+        console.log('got ' + msg);
+    });
 </script>
 </body>
 </html>

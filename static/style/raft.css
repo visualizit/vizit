@@ -1,0 +1,23 @@
+.node_name {
+    font-size: 30px;
+}
+
+.node_term {
+    font-size: 30px;
+}
+
+.node_timer {
+    stroke-width: 8;
+    stroke: blue;
+    stroke-dasharray: 315, 315;
+    stroke-dashoffset: 315;
+    opacity: 0.5;
+    fill: none
+}
+
+.follower {
+    fill: palevioletred;
+    stroke: #b5580d;
+    stroke-width: 8;
+    opacity: 0.8
+}
