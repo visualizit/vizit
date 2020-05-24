@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Raft集群 监控动画 - Raft Cluster Monitor </title>
-    <link rel="stylesheet" type="text/css" href="style/raft.css?92">
+    <link rel="stylesheet" type="text/css" href="style/raft.css?93">
 </head>
 <body>
 <svg id="raft" width="1600" height="900">
@@ -19,23 +19,24 @@
         socket.emit('client action', {data: 'raft monitor is connected!'});
     });
 
-    function reset_timer(timer) {
-        timer.attr({"stroke-dashoffset": 315})
+    function reset_timer(node_g) {
+        node_g.select(`.node_timer`).attr({"stroke-dashoffset": 315})
+        node_g.select(`.node_timer_count`).attr({text: "0000"});
     }
 
     socket.on('update state', function (msg) {
         console.log('got ' + msg);
         let data = JSON.parse(msg);
         let node_g = snap.select(`#S${data.id}`);
-        node_g.select(`circle`).addClass(data.state);
+        node_g.select(`circle`).attr({class:data.state});
         node_g.select(`.node_term`).attr({text: `${data.term}`});
         Snap.animate(0, data.timeout, function (value) {
             node_g.select(`.node_timer_count`).attr({text: Math.round(data.timeout - value)});
         }, data.timeout);
         let timer = node_g.select(`.node_timer`);
-        reset_timer(timer);
+        reset_timer(node_g);
         timer.animate({"stroke-dashoffset": 0},
-            data.timeout, mina.easeinout, reset_timer.bind(null, timer));
+            data.timeout, mina.easeinout, reset_timer.bind(null, node_g));
 
     });
 
@@ -50,10 +51,10 @@
             id: node,
             transform: `translate(${translates[i][0]} ${translates[i][1]})`
         });
-        node_g.text(35, 0, node).addClass("node_name");
         node_g.circle(50, 80, 50).addClass("follower");
         node_g.text(40, 65, "1").addClass("node_term");
         node_g.text(20, 95, "").addClass("node_timer_count");
+        node_g.text(40, 120, node).addClass("node_name");
         node_g.path("M 50, 30 a 50,50 0 1,1 0,100 a 50,50 0 1,1 0,-100").addClass("node_timer");
     }
 
