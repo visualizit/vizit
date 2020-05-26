@@ -13,12 +13,6 @@ app.config['SECRET_KEY'] = 'secret!'
 socket_io = SocketIO(app)
 
 
-@app.route('/monitor/action', methods=['POST'])
-def monitor_action():
-    action = request.get_json()
-    return jsonify(action)
-
-
 @app.route('/monitor/state', methods=['POST'])
 def monitor_state():
     payload = request.get_json()
@@ -27,10 +21,12 @@ def monitor_state():
     return payload
 
 
-@app.route('/', methods=['GET'])
-def index():
-    socket_io.emit('update monitor', f'now: {datetime.now()}', namespace=NAMESPACE)
-    return 'hello'
+@app.route('/monitor/heartbeat', methods=['POST'])
+def monitor_heartbeat():
+    payload = request.get_json()
+    logging.info(f'heartbeat {payload}')
+    socket_io.emit('heartbeat', json.dumps(payload), namespace=NAMESPACE)
+    return payload
 
 
 @socket_io.on('client action', namespace=NAMESPACE)

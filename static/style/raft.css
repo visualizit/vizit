@@ -1,5 +1,5 @@
 .node_name {
-    font-size: 30px;
+    font-size: 26px;
 }
 
 .node_timer_count {
@@ -18,6 +18,12 @@
     stroke-dashoffset: 315;
     opacity: 0.5;
     fill: none
+}
+
+.dot {
+    fill: none;
+    stroke: #b5580d;
+    stroke-width: 3;
 }
 
 .follower {
