@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>JVM GC 垃圾回收 </title>
-    <link rel="stylesheet" type="text/css" href="style/jvm.css?3">
+    <link rel="stylesheet" type="text/css" href="style/jvm.css?6">
 </head>
 <body>
 <svg id="jvm" width="1600" height="900">
     <g id="heap">
         <g id="young" transform="translate(100 100)"/>
-        <g id="old" transform="translate(300 100)"/>
-        <g id="perm" transform="translate(500 100)"/>
+        <g id="old" transform="translate(100 400)"/>
     </g>
 
 </svg>
@@ -19,8 +18,8 @@
 <script src="scripts/snap.svg.js"></script>
 <script src="scripts/snap.plugin.js"></script>
 <script type="text/javascript" charset="utf-8">
-    let eden_width = 300;
-    let eden_height = eden_width/2;
+    let eden_width = 800;
+    let eden_height = eden_width/4; // 200
     let young = Snap('#young');
     let eden = young.g().attr({id:'eden', transform:"translate(0 0)"});
     eden.rect(0, 0, eden_width, eden_height).addClass('eden');
@@ -30,6 +29,30 @@
     let s1 = young.g().attr({id:'s0', transform:`translate(${eden_width/2} ${eden_height})`});
     s1.rect(0, 0, eden_width / 2, eden_height / 4).addClass('survivor');
 
+    let old = Snap('#old');
+    old.rect(0, 0, eden_width, eden_height * 2).addClass('old');
+
+    let obj_width = 20;
+    let obj_height = 20;
+
+    let current_x = 0;
+    let current_y = 0;
+    let allocated = 0;
+    let colors = ["black", "yellow","red","pink","green", "blue"]
+    for (let i = 0; i < 200; i++) {
+        let width = obj_width * Math.floor(Math.random() * 5);
+        if (current_x + width > eden_width) { // width overflow
+            width = eden_width - current_x; // cut
+        }
+        eden.rect(current_x, current_y, width, obj_height)
+            .attr({fill:colors[Math.floor(Math.random() * 10)], stroke:"gray", "stroke-width":2});
+        current_x += width;
+        if (current_x == eden_width) {// next row
+            current_x = 0;
+            current_y += obj_height;
+        }
+        allocated += width;
+    }
 </script>
 </body>
 </html>
