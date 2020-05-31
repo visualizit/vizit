@@ -8,8 +8,12 @@
 <body>
 <svg id="jvm" width="1600" height="900">
     <g id="heap">
-        <g id="young" transform="translate(100 100)"/>
-        <g id="old" transform="translate(100 400)"/>
+        <g id="new" transform="translate(500 50)">
+            <ellipse rx="50" ry="30" fill="none" stroke="blue"/>
+            <text x="-20" y="5" font-size="28"> new</text>
+        </g>
+        <g id="young" transform="translate(100 150)"/>
+        <g id="old" transform="translate(100 650)"/>
     </g>
 
 </svg>
@@ -19,7 +23,11 @@
 <script src="scripts/snap.plugin.js"></script>
 <script type="text/javascript" charset="utf-8">
     let eden_width = 800;
-    let eden_height = eden_width / 4; // 200
+    let eden_height = 320;
+    let obj_width = 80;
+    let obj_height = 40;
+    let colors = ["yellow", "red", "pink", "green", "blue"]
+
     function allocate_heap() {
         let young = Snap('#young');
         let eden = young.g().attr({id: 'eden', transform: "translate(0 0)"});
@@ -27,14 +35,13 @@
         let SurvivorRatio = 8; // survivor:eden = 1:8
         let s0 = young.g().attr({id: 's0', transform: `translate(0 ${eden_height + 20})`});
         s0.rect(0, 0, eden_width / 1, eden_height / 8).addClass('survivor');
-        let s1 = young.g().attr({id: 's1', transform: `translate(0 ${eden_height + 60})`});
+        let s1 = young.g().attr({id: 's1', transform: `translate(0 ${eden_height + 80})`});
         s1.rect(0, 0, eden_width / 1, eden_height / 8).addClass('survivor');
 
         let NewRatio = 2; // young:old = 1:2
         let old = Snap('#old');
         old.rect(0, 0, eden_width, eden_height * NewRatio).addClass('old');
     }
-
 
     function mark(range_start, range_end) {
         let lives = [];
@@ -43,61 +50,69 @@
             lives.push(live_obj);
             console.log(`${range_start} - ${range_end}: live, ${live_obj}`)
             let obj = Snap(`#obj-${live_obj}`);
-            obj.select('rect').animate({fill: 'purple'}, 3000, mina.bounce);
+            obj.select('rect').animate({fill: 'white'}, 3000, mina.bounce);
         }
         return lives;
     }
 
-    function minor_gc(range_start, range_end, empty_s) {
-        let lives = mark(range_start, range_end);
+    function copy(empty_s, lives) {
         let s = Snap(`#s${empty_s}`);
         let offset_x = 0;
-        let offset_y = 0;
+        let offset_y = 2;
         for (let i = 0; i < lives.length; i++) {
-            let obj = Snap(`#obj-${lives[i]}`).clone().attr({id:`copy-obj-${lives[i]}`});
+            let obj = Snap(`#obj-${lives[i]}`).clone().attr({id: `copy-obj-${lives[i]}`});
             s.add(obj);
-            obj.animate({transform:`translate(${offset_x} ${offset_y})`}, 1000, mina.linear);
+            obj.animate({transform: `translate(${offset_x} ${offset_y})`}, 1000, mina.linear);
             offset_x += obj.select('rect').getBBox().width;
             console.log(`offset: ${offset_x}`)
         }
     }
 
-    function new_objects() {
+    function minor_gc(range_start, range_end, empty_s) {
+        let lives = mark(range_start, range_end);
+        copy(empty_s, lives);
+    }
+
+    function allocate_one_obj(i, eden_state, width) {
         let eden = Snap('#eden');
-        let obj_width = 80;
-        let obj_height = 20;
+        let obj = eden.g().attr({id: `obj-${i}`, transform: `translate(${eden_state.current_x}, ${eden_state.current_y})`});
+        obj.rect(0, 0, width, obj_height)
+            .attr({
+                fill: colors[Math.floor(Math.random() * 5)],
+                stroke: "gray",
+                "stroke-width": 2,
+            })
+            .addClass("obj_new");
+        obj.text(width / 2, obj_height / 2 + 5, i);
+    }
+
+    function new_objects() {
         let eden_capacity = eden_width * eden_height / obj_height / obj_width;
         console.log(`eden_capacity: ${eden_capacity}`);
 
-        let current_x = 0;
-        let current_y = 0;
-        let allocated = 0;
-        let colors = ["yellow", "red", "pink", "green", "blue"]
+        let eden_state = {
+            current_x : 0,
+            current_y : 0,
+            allocated : 0
+        }
+
         let range_start = 0;
         let range_end = 0;
         let empty_s = 0;
         for (let i = 1; i < 200; i++) {
-            let width = obj_width * Math.ceil(Math.random() * 3);
-            if (current_x + width > eden_width) { // width overflow
-                width = eden_width - current_x; // cut
+            let width = obj_width * Math.ceil(Math.random() * 2);
+            if (eden_state.current_x + width > eden_width) { // width overflow
+                width = eden_width - eden_state.current_x; // cut
             }
-            let obj = eden.g().attr({id: `obj-${i}`, transform:`translate(${current_x}, ${current_y})`});
-            obj.rect(0, 0, width, obj_height)
-                .attr({
-                    fill: colors[Math.floor(Math.random() * 5)],
-                    stroke: "gray",
-                    "stroke-width": 2,
-                })
-                .addClass("obj_new");
-            obj.text(width / 2, obj_height / 2 + 5, i);
-            current_x += width;
-            if (current_x == eden_width) {// next row
-                current_x = 0;
-                current_y += obj_height;
+            allocate_one_obj(i, eden_state, width);
+            eden_state.current_x += width;
+            if (eden_state.current_x == eden_width) {// next row
+                eden_state.current_x = 0;
+                eden_state.current_y += obj_height;
             }
-            allocated += width / obj_width;
-            console.log(`allocated: ${allocated}`)
-            if (allocated >= eden_capacity) {
+            eden_state.allocated += width / obj_width;
+            console.log(`eden_state: ${eden_state}`)
+            if (eden_state.allocated >= eden_capacity) {
                 range_end = i;
                 minor_gc(range_start, range_end, empty_s);
                 empty_s = 1 - empty_s; // switch to the other
