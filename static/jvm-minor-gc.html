@@ -63,6 +63,7 @@
             this.start_obj_id = this.next_obj_id;
         },
         mark() {
+            this.lives = [];
             for (let i = 0; i < 3; i++) { // pick 3 and mark as live object
                 let live_obj = this.find_live_obj;
                 this.lives.push(live_obj);
@@ -129,6 +130,7 @@
             this.copy();
             this.switch_survivor();
             this.move_start_obj_id();
+            this.allocated = 0;
             console.log(`eden_space after gc: ${JSON.stringify(eden_space)}`);
         }
     }
@@ -163,7 +165,7 @@
     }
 
     function new_objects() {
-        let obj_count = 200;
+        let obj_count = 58;
         while (obj_count > 0) {
             let obj_size = Math.ceil(Math.random() * 2);
             eden_space.allocate_one_obj(obj_size);
@@ -172,7 +174,7 @@
     }
 
     init_heap();
-    // new_objects();
+    new_objects();
 </script>
 </body>
 </html>
