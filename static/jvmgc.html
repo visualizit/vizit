@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JVM GC 垃圾回收 </title>
+    <link rel="stylesheet" type="text/css" href="style/jvm.css?3">
+</head>
+<body>
+<svg id="jvm" width="1600" height="900">
+    <g id="heap">
+        <g id="young" transform="translate(100 100)"/>
+        <g id="old" transform="translate(300 100)"/>
+        <g id="perm" transform="translate(500 100)"/>
+    </g>
+
+</svg>
+<script src="scripts/jquery.js"></script>
+<script src="scripts/socket.io.js"></script>
+<script src="scripts/snap.svg.js"></script>
+<script src="scripts/snap.plugin.js"></script>
+<script type="text/javascript" charset="utf-8">
+    let eden_width = 300;
+    let eden_height = eden_width/2;
+    let young = Snap('#young');
+    let eden = young.g().attr({id:'eden', transform:"translate(0 0)"});
+    eden.rect(0, 0, eden_width, eden_height).addClass('eden');
+
+    let s0 = young.g().attr({id:'s0', transform:`translate(0 ${eden_height})`});
+    s0.rect(0, 0, eden_width/2, eden_height/4).addClass('survivor');
+    let s1 = young.g().attr({id:'s0', transform:`translate(${eden_width/2} ${eden_height})`});
+    s1.rect(0, 0, eden_width / 2, eden_height / 4).addClass('survivor');
+
+</script>
+</body>
+</html>

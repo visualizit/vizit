@@ -1,0 +1,10 @@
+.eden {
+    fill: orange;
+    stroke: gray;
+    stroke-width: 5;
+}
+.survivor {
+    fill: greenyellow;
+    stroke: gray;
+    stroke-width: 5;
+}
