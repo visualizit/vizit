@@ -80,7 +80,7 @@
                     let obj = Snap(`#obj-${live_obj}`);
                     obj.select('rect').animate({fill: 'white'}, 3000, mina.bounce);
                     Snap.animate(0, 1, function (value) {
-                        obj.select('text').attr({'font-size': 100, x: 15, y:35, opacity: value});
+                        obj.select('text').attr({'font-size': 100, x: 15, y: 35, opacity: value});
                     }, 500, mina.bounce);
                 }, 1000 * i);
             }
@@ -198,6 +198,20 @@
 
     init_heap();
     new_objects();
+
+    let socket = io('/jvm-monitor');
+    socket.on('connect', function () {
+        socket.emit('client action', {data: 'jvm monitor is connected!'});
+    });
+
+    socket.on('update heap', function (msg) {
+        console.log(msg);
+    });
+
+    socket.on('update jvm', function (msg) {
+        console.log(msg);
+    });
+
 </script>
 </body>
 </html>
