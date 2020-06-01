@@ -37,6 +37,14 @@
         }
     }
 
+    let new_dot = Snap('#heap').circle(500, 50, 10).attr(
+        {
+            stroke: "blue",
+            "stroke-width": 3,
+            fill: "none"
+        }
+    );
+
     let eden_space = {
         current_x: 0,
         current_y: 0,
@@ -62,7 +70,7 @@
         move_start_obj_id: function () {
             this.start_obj_id = this.next_obj_id;
         },
-        mark() {
+        mark: function () {
             this.lives = [];
             for (let i = 0; i < 3; i++) { // pick 3 and mark as live object
                 let live_obj = this.find_live_obj;
@@ -92,6 +100,10 @@
             }
         },
         draw: function (cut_width) {
+            setTimeout(function () {
+                new_dot.attr({cx: 500, cy: 80});
+                new_dot.animate({cx: 500, cy: 150}, 100, mina.linear);
+            }, 10);
             let eden = Snap('#eden');
             let obj_g = eden.g().attr({
                 id: `obj-${this.next_obj_id}`,
@@ -168,7 +180,10 @@
         let obj_count = 58;
         while (obj_count > 0) {
             let obj_size = Math.ceil(Math.random() * 2);
-            eden_space.allocate_one_obj(obj_size);
+            setTimeout(function () {
+                eden_space.allocate_one_obj(obj_size);
+            }, 100 * obj_count);
+
             obj_count--;
         }
     }
