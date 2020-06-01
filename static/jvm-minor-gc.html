@@ -76,8 +76,13 @@
                 let live_obj = this.find_live_obj;
                 this.lives.push(live_obj);
                 console.log(`${JSON.stringify(eden_space)}`)
-                let obj = Snap(`#obj-${live_obj}`);
-                obj.select('rect').animate({fill: 'white'}, 3000, mina.bounce);
+                setTimeout(function () {
+                    let obj = Snap(`#obj-${live_obj}`);
+                    obj.select('rect').animate({fill: 'white'}, 3000, mina.bounce);
+                    Snap.animate(0, 1, function (value) {
+                        obj.select('text').attr({'font-size': 100, x: 15, y:35, opacity: value});
+                    }, 500, mina.bounce);
+                }, 1000 * i);
             }
         },
         copy: function () {
@@ -91,6 +96,9 @@
                 offset_x += obj.select('rect').getBBox().width;
                 console.log(`offset: ${offset_x}`)
             }
+        },
+        sweep: function () {
+
         },
         move_pointer: function (width) {
             this.current_x += width;
