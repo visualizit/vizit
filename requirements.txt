@@ -8,7 +8,7 @@ graphviz==0.14
 greenlet==0.4.15
 itsdangerous==1.1.0
 jdcal==1.4.1
-Jinja2==2.11.2
+Jinja2==2.11.3
 kafka-python==2.0.1
 livereload==2.6.1
 MarkupSafe==1.1.1
